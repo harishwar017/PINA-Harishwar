@@ -1,0 +1,28 @@
+Metadata-Version: 2.1
+Name: pina-mathlab
+Version: 0.0.2
+Summary: Physic Informed Neural networks for Advance modeling.
+Home-page: https://github.com/mathLab/PINA
+Author: Nicola Demo, Maria Strazzullo
+Author-email: demo.nicola@gmail.com, 
+License: MIT
+Keywords: physics-informed neural-network
+Classifier: Development Status :: 3 - Alpha
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+License-File: LICENSE.rst
+Requires-Dist: future
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: torch
+Provides-Extra: docs
+Requires-Dist: sphinx; extra == "docs"
+Requires-Dist: sphinx_rtd_theme; extra == "docs"
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: pytest-cov; extra == "test"
