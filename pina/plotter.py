@@ -112,7 +112,7 @@ class Plotter:
         savemat("Burgers_Dis_AD_3.mat", mdic)
     
     def plot(self, pinn, components=None, fixed_variables={}, method='contourf',
-             res= 1000, filename=None, **kwargs):
+             res= 100, filename=None, **kwargs):
         """
         """
         if components is None:
