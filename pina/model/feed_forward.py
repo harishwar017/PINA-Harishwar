@@ -26,6 +26,7 @@ class FeedForward(torch.nn.Module):
     :param iterable(torch.nn.Module) extra_features: the additional input
         features to use ad augmented input.
     """
+    torch.manual_seed(10)
     def __init__(self, input_variables, output_variables, inner_size=20,
                  n_layers=2, func=nn.Tanh, layers=None, extra_features=None):
         """
