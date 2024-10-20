@@ -234,6 +234,7 @@ class PINN(object):
                                 residuals))
                         losses.append(local_loss)
                         
+                        
                 if hasattr(condition, 'output_points'):
                     pts = condition.input_points
                     pts = (pts.to(dtype=self.dtype,device=self.device))
