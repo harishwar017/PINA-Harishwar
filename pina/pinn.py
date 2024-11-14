@@ -241,16 +241,27 @@ class PINN(object):
                     pts.requires_grad_(True)
                     pts.retain_grad()
                     predicted = self.model(pts)
-                    list_arrayD = self.rand_choice_integer_Data 
-                    residuals = (predicted[list_arrayD,:] - condition.output_points[list_arrayD,:]).reshape(-1,1) 
+                    # list_arrayD = self.rand_choice_integer_Data 
+                    # list_arrayD = [torch.linspace(0, 200000, 200)]
+                    
+                    # list_arrayD = torch.linspace(0, 20200, 1)
+                    # list_arrayD = list_arrayD.tolist()
+                    
+                    # residuals = (predicted[list_arrayD,:] - condition.output_points[list_arrayD,:]).reshape(-1,1) 
                     # print("residuals are ===", residuals)                    
                     # residuals = residuals[list_arrayD,:]
+                    
+                    residuals = (predicted - condition.output_points).reshape(-1,1) 
                     local_loss = (
                         condition.data_weight*self._compute_norm(residuals))
                     losses.append(local_loss)
+                    
             self.optimizer.zero_grad()
-            
-            sum(losses).backward()
+            # print("losses....................", losses)
+            # sum(losses)
+            # (losses[0] + losses[1]).backward()
+            # print("lossses", losses[-1])
+            losses[-1].backward()
             self.optimizer.step()
 
             if save_loss and (epoch % save_loss == 0 or epoch == 0):

@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+import pandas as pd
 
 from pina import LabelTensor
 from pina import PINN
@@ -180,3 +181,63 @@ class Plotter:
         # plt.plot(epochs, loss, label=label)
         # if log_scale:
             # plt.yscale('log')
+
+    def plot_with_existing_points(pinn, components=None, fixed_variables={}, method='contourf',
+                                res=25, filename=None, **kwargs):
+        """
+        Modified plot function to use existing training/test data points (input and output points)
+        instead of sampling new points.
+        """
+        if components is None:
+            components = [pinn.problem.output_variables]
+        print(components)
+        try:
+            # Iterate over conditions to find input and output points
+            for condition_name in pinn.problem.conditions:
+                condition = pinn.problem.conditions[condition_name]
+                
+                if hasattr(condition, 'output_points'):
+                    # Use input and output points directly
+                    pts = condition.input_points.to(dtype=pinn.dtype, device=pinn.device)
+                    pts.requires_grad_(True)
+                    pts.retain_grad()
+                    
+                    # Make predictions based on input points
+                    predicted_output = pinn.model(pts)
+                    
+            if isinstance(components, str):
+                predicted_output = predicted_output.extract(components)
+            elif callable(components):
+                predicted_output = components(predicted_output)
+
+            # Convert output to numpy arrays
+            predicted_output_array = predicted_output.detach().cpu().numpy()
+            pts_array = pts.detach().cpu().numpy()
+            
+            # Remove points where coordinates are (0, 0, 0)
+            non_zero_mask = ~((pts_array == 0).all(axis=1))
+            pts_array = pts_array[non_zero_mask]
+            predicted_output_array = predicted_output_array[non_zero_mask]
+
+            # Print shapes for verification
+            print(f"Filtered Predicted output array shape: {predicted_output_array.shape}")
+            print(f"Filtered Points array shape: {pts_array.shape}")
+
+            # Create DataFrames for the predictions and input points
+            df_predicted_output = pd.DataFrame(predicted_output_array, columns=['Prediction'])
+            df_pts = pd.DataFrame(pts_array, columns=[f'Variable_{i}' for i in range(pts_array.shape[1])])
+            
+            # Save to .csv files
+            df_predicted_output.to_csv("problems/QGE/plotting/predicted_output.csv", index=False)
+            df_pts.to_csv("problems/QGE/plotting/points.csv", index=False)
+            
+            # Optionally, save plot
+            if filename:
+                plt.title(f'Output {components} with parameter {fixed_variables}')
+                plt.savefig(filename)
+            else:
+                plt.show()
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+

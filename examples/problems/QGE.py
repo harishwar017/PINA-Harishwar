@@ -1,16 +1,26 @@
-
 import torch
+import pandas as pd
 
 from pina.problem import SpatialProblem, TimeDependentProblem
 from pina.operators import nabla, grad, div, curl, advection
 from pina import Condition, Span, LabelTensor
 
+output_data = pd.read_csv("problems/QGE/data/q_si.csv", skiprows=None, header=None)
+output_data = output_data.apply(pd.to_numeric, errors='coerce').fillna(0).values
+output_tensor = torch.from_numpy(output_data).float()
+ 
+input_data = pd.read_csv("problems/QGE/data/input_xyt.csv",skiprows = None , header = None)
+input_data = input_data.apply(pd.to_numeric, errors='coerce').fillna(0).values
+input_tensor = torch.from_numpy(input_data).float()
+ 
+input_tensor = LabelTensor(input_data,['x', 'y', 't'])
+output_tensor = LabelTensor(output_data,['q', 'si'])
 
 class QGE(SpatialProblem, TimeDependentProblem):
 
     output_variables = ['q', 'si']
     spatial_domain = Span({'x': [0, 1], 'y': [-1, 1]})
-    temporal_domain = Span({'t': [0, 100]})
+    temporal_domain = Span({'t': [0, 1]})
     
     def rand_choice_integer_Data(self):
         pass 
@@ -46,7 +56,7 @@ class QGE(SpatialProblem, TimeDependentProblem):
         si_curl = curl(output_.extract(['si']), input_, d = ['x', 'y'])
         return div(si_curl, input_, d = ['x', 'y'])
 
-    def initial(input_, output_):
+    def initial_si(input_, output_):
         value = 0.0
         return output_.extract(['si']) - value
     
@@ -60,12 +70,15 @@ class QGE(SpatialProblem, TimeDependentProblem):
         
     
     conditions = {
-        't0': Condition(Span({'x': [0, 1], 'y': [-1, 1], 't' : 0}), initial),
+        # 't0': Condition(Span({'x': [0, 1], 'y': [-1, 1], 't' : 0}), [initial_si, zeta]),
         
-        'upper': Condition(Span({'x':  [0,1], 'y': 1, 't': [0,100]}), [si, zeta]),
-        'fixedWall1': Condition(Span({'x':  0, 'y': [-1,1], 't': [0,100]}), [si, zeta]),
-        'fixedWall2': Condition(Span({'x':  1, 'y': [-1,1], 't': [0,100]}), [si, zeta]),
-        'fixedWall3': Condition(Span({'x':  [0,1], 'y': -1, 't': [0,100]}), [si, zeta]),
+        # 'upper': Condition(Span({'x':  [0,1], 'y': 1, 't': [0,1]}), [si, zeta]),
+        # 'fixedWall1': Condition(Span({'x':  0, 'y': [-1,1], 't': [0,1]}), [si, zeta]),
+        # 'fixedWall2': Condition(Span({'x':  1, 'y': [-1,1], 't': [0,1]}), [si, zeta]),
+        # 'fixedWall3': Condition(Span({'x':  [0,1], 'y': -1, 't': [0,1]}), [si, zeta]),
         
-        'D': Condition(Span({'x': [0, 1], 'y': [-1, 1], 't': [0, 100]}), [eq1, eq2]),
+        # 'D': Condition(Span({'x': [0, 1], 'y': [-1, 1], 't': [0, 1]}), [eq1, eq2]),
+        'D':Condition(Span({'x': [0, 1], 'y': [-1, 1], 't': [0, 1]}), [eq1]),
+        
+        'E': Condition(input_points = input_tensor,output_points = output_tensor),
     }
