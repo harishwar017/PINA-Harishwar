@@ -16,13 +16,10 @@ pina/span1.py
 pina/utils.py
 pina/adaptive_functions/__init__.py
 pina/adaptive_functions/adaptive_cos.py
-pina/adaptive_functions/adaptive_exp.py
 pina/adaptive_functions/adaptive_linear.py
 pina/adaptive_functions/adaptive_relu.py
-pina/adaptive_functions/adaptive_sin.py
 pina/adaptive_functions/adaptive_softplus.py
 pina/adaptive_functions/adaptive_square.py
-pina/adaptive_functions/adaptive_tanh.py
 pina/model/LSTM_network.py
 pina/model/__init__.py
 pina/model/deeponet.py
